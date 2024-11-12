@@ -1,10 +1,11 @@
-package user
+package repository
 
 import (
 	"context"
 	"database/sql"
 	"fmt"
 	"food-ordering/internal/domain"
+	"food-ordering/internal/domain/repository"
 )
 
 type userRepository struct {
@@ -36,11 +37,6 @@ func (u *userRepository) FetchAllMenu(ctx context.Context) ([]domain.Menu, error
 	return menus, nil
 }
 
-func (u *userRepository) OrderMenu(ctx context.Context, order domain.Order) error {
-	//TODO implement me
-	panic("implement me")
-}
-
-func NewRepository(db *sql.DB) User {
+func NewCatalogRepository(db *sql.DB) repository.CatalogRepository {
 	return &userRepository{db: db}
 }

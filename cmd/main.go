@@ -1,12 +1,14 @@
 package main
 
 import (
-	uc "food-ordering/internal/application/usecase/user"
+	ucResto "food-ordering/internal/application/usecase/resto"
+	"food-ordering/internal/application/usecase/user"
 	"food-ordering/internal/config"
-	"food-ordering/internal/infrastructure/repository/user"
+	"food-ordering/internal/infrastructure/repository"
 	"food-ordering/internal/presentation/handler"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	log "github.com/sirupsen/logrus"
 	"os"
 )
@@ -29,12 +31,21 @@ func main() {
 
 	log.Info("database is connected")
 
-	menuRepo := user.NewRepository(db)
-	menuUseCase := uc.NewUC(menuRepo)
+	menuRepo := repository.NewCatalogRepository(db)
+	menuUseCase := ucResto.NewCatalogUseCase(menuRepo)
+
+	registerRepo := repository.NewUserRepository()
+	registerUseCase := user.NewUserUseCase(registerRepo)
 
 	e := echo.New()
-	menuHandler := handler.NewHandler(menuUseCase)
-	e.GET("/menus", menuHandler.HandleMenu)
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+
+	registerHandler := handler.NewUserHandler(registerUseCase)
+	e.POST("/regsiter", registerHandler.HandleRegister)
+
+	menuHandler := handler.NewCatalogHandler(menuUseCase)
+	e.GET("/menus", menuHandler.HandleCatalogMenu)
 
 	port := os.Getenv("PORT")
 	if port == "" {
