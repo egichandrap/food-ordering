@@ -1,7 +1,3 @@
-Berikut adalah template `README.md` yang dirancang untuk proyek Anda. Saya telah memasukkan detail berdasarkan informasi yang Anda berikan tentang proyek Rest API Food Ordering Service menggunakan Go, Echo, dan Clean Architecture.
-
----
-
 # 🛒 Rest API for Food Ordering Service with Echo Framework in Golang and Clean Architecture
 
 ## 📋 Table of Contents
