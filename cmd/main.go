@@ -6,6 +6,7 @@ import (
 	"food-ordering/internal/config"
 	"food-ordering/internal/infrastructure/repository"
 	"food-ordering/internal/presentation/handler"
+	"food-ordering/internal/presentation/middlewares"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -31,21 +32,25 @@ func main() {
 
 	log.Info("database is connected")
 
-	menuRepo := repository.NewCatalogRepository(db)
-	menuUseCase := ucResto.NewCatalogUseCase(menuRepo)
-
-	registerRepo := repository.NewUserRepository()
-	registerUseCase := user.NewUserUseCase(registerRepo)
-
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
+	registerRepo := repository.NewUserRepository()
+	registerUseCase := user.NewUserUseCase(registerRepo)
 	registerHandler := handler.NewUserHandler(registerUseCase)
-	e.POST("/regsiter", registerHandler.HandleRegister)
+	e.POST("/register", registerHandler.HandleRegister)
 
+	menuRepo := repository.NewCatalogRepository(db)
+	menuUseCase := ucResto.NewCatalogUseCase(menuRepo)
 	menuHandler := handler.NewCatalogHandler(menuUseCase)
-	e.GET("/menus", menuHandler.HandleCatalogMenu)
+	e.GET("/menus", menuHandler.HandleCatalogMenu, middlewares.JWTMiddleware)
+
+	cartRepo := repository.NewCartRepository()
+	cartUseCase := ucResto.NewCartUseCase(cartRepo, nil)
+	cartHandler := handler.NewCartHandler(cartUseCase)
+	e.POST("/add-cart", cartHandler.HandleCrtItem, middlewares.JWTMiddleware)
+	e.POST("/checkout", cartHandler.HandleCheckout, middlewares.JWTMiddleware)
 
 	port := os.Getenv("PORT")
 	if port == "" {

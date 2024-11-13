@@ -3,6 +3,7 @@ package resto
 import (
 	"context"
 	"errors"
+	"fmt"
 	"food-ordering/internal/domain"
 	"food-ordering/internal/domain/repository"
 	"food-ordering/internal/domain/usecase"
@@ -25,9 +26,10 @@ func (c *cartUseCaseImpl) CheckoutCart(ctx context.Context, userID string) (*dom
 		return nil, errors.New("cart is empty")
 	}
 
+	fmt.Println("cart", cart)
+
 	order := domain.Order{
 		ID:         helper.GenerateOrderID(),
-		UserID:     userID,
 		CertID:     cart.ID,
 		TotalPrice: cart.Total,
 		Status:     "pending",

@@ -17,14 +17,14 @@ func GenerateJWT(userID string) (string, error) {
 	return token.SignedString(jwtSecret)
 }
 
-func ValidateJWT(tokenString string) (int, error) {
+func ValidateJWT(tokenString string) (string, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return jwtSecret, nil
 	})
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		userID := int(claims["user_id"].(float64))
+		userID := claims["user_id"].(string)
 		return userID, nil
 	}
-	return 0, err
+	return "", err
 }
