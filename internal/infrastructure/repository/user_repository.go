@@ -5,7 +5,7 @@ import (
 	"errors"
 	"food-ordering/internal/domain"
 	"food-ordering/internal/domain/repository"
-	"strconv"
+	"food-ordering/internal/infrastructure/helper"
 )
 
 type UserRepo struct {
@@ -13,11 +13,13 @@ type UserRepo struct {
 }
 
 func (u *UserRepo) CreateUser(ctx context.Context, user domain.User) (string, error) {
+
+	// todo "changes to get data on table users"
 	if _, exists := u.users[user.Username]; exists {
 		return "", errors.New("username already exists")
 	}
 
-	user.ID = strconv.Itoa(len(u.users) + 1)
+	user.ID = helper.GenerateUserID()
 	u.users[user.Username] = user
 	return user.ID, nil
 }
